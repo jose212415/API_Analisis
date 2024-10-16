@@ -64,16 +64,63 @@ const typeDefs = gql`
         active: Boolean
     }
 
+    type TravelPlace {
+        Id: ID!
+        TravelId: Int
+        PlaceId: Int
+        active: Boolean
+        travel: Travel
+        place: Place  
+    }
+
+    type TravelCategory {
+        travelPlace: TravelPlace
+        travel: Travel
+        place: Place
+    }
+
+    type TypePayment {
+        Id: ID!
+        Name: String
+        Surcharge: Float
+        active: Boolean
+    }
+
+    type Payment {
+        Id: ID!
+        ProofPayment: String
+        Date: String
+        Time: String
+        Discount: Float 
+        TypeId: Int
+        Approved: Boolean
+        active: Boolean
+    }
+
+    type PaymentTravelUser {
+        Id: ID!
+        TravelId: Int
+        UserId: Int
+        PaymentId: Int
+        active: Boolean
+    }
+
     type Query {
-        users: [User]
+        users(limit: Int, offset: Int): [User]
         user(Id: ID!): User
 
         activities: [Activity]
-        travels: [Travel]
+        travels(limit: Int, offset: Int): [Travel]
         countries: [Country]
         cities: [City]
         placeCategories: [PlaceCategory]
         places: [Place]
+        travelPlaces: [TravelPlace]
+        travelsCompleted: [Travel]
+        typePayments: [TypePayment]
+        payments: [Payment]
+        paymentsTravelUser: [PaymentTravelUser]
+        
 
         activity(Id: ID!): Activity
         travel(Id: ID!): Travel
@@ -81,6 +128,14 @@ const typeDefs = gql`
         city(Id: ID!): City
         placeCategory(Id: ID!): PlaceCategory
         place(Id: ID!): Place
+        travelPlace(Id: ID!): TravelPlace
+        travelCategory(CategoryId: Int): [TravelCategory]
+        travelByName(Name: String): [Travel]
+        travelByDateRange(StartDate: String, EndDate: String): [Travel]
+        typePayment(Id: ID!): TypePayment
+        payment(Id: ID!): Payment
+        paymentUser(Id: ID!): PaymentTravelUser
+        paymentTravelUser(Id: ID!): PaymentTravelUser
     }
 
     type Response {
@@ -92,6 +147,10 @@ const typeDefs = gql`
         city: City
         placeCategory: PlaceCategory
         place: Place
+        travelPlace: TravelPlace
+        typePayment: TypePayment
+        payment: Payment
+        paymentTravelUser: PaymentTravelUser
     }   
     
     # Definir el tipo Mutation
@@ -107,6 +166,17 @@ const typeDefs = gql`
             Birthdate: String
             Image: String
             active: Boolean = true
+        ): Response
+
+        updateUser(
+            Id: Int!
+            NameUsers: String!
+            LastName: String!
+            Email: String!
+            Phone: String
+            Address: String
+            Birthdate: String
+            Image: String
         ): Response
 
         login(
@@ -143,6 +213,31 @@ const typeDefs = gql`
             Description: String
             CityId: Int
             PlaceCategoryId: Int
+        ): Response
+
+        createTravelPlace(
+            TravelId: Int
+            PlaceId: Int
+        ): Response
+
+        createTypePayment(
+            Name: String
+            Surcharge: Float
+        ): Response
+
+        createPayment(
+            ProofPayment: String
+            Date: String
+            Time: String
+            Discount: Float 
+            TypeId: Int
+            Approved: Boolean
+        ): Response
+
+        createPaymentTravelUser(
+            TravelId: Int
+            UserId: Int
+            PaymentId: Int
         ): Response
     }
 `;
