@@ -63,7 +63,7 @@ const resolvers = {
                 rol: user.Rol
                 },
                 SECRET_KEY,
-                { expiresIn: '2h' } // Token expira en 2 horas
+                { expiresIn: '1y' } // Token expira en 2 horas
             );
 
             // Si el email y la contraseña coinciden, devolver el usuario
