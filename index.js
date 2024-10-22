@@ -1,16 +1,20 @@
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
+const { graphqlUploadExpress } = require('graphql-upload');
 const typeDefs = require('./graphql/typeDefs');
 const resolvers = require('./graphql/resolvers');
 const { getUserFromToken } = require('./utils/auth');
 
 const startServer = async () => {
     const app = express();
+
+    app.use(graphqlUploadExpress());
+
     const server = new ApolloServer({
         typeDefs,
         resolvers,
         introspection: true,
-        playground: true,  
+        playground: true,
         context: ({ req }) => {
             const token = req.headers.authorization || '';
             const user = getUserFromToken(token.replace('Bearer ', ''));

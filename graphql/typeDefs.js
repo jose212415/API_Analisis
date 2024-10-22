@@ -2,6 +2,8 @@ const { gql } = require('apollo-server-express');
 
 // Definición del esquema GraphQL
 const typeDefs = gql`
+    scalar Upload
+
     type Activity {
         Id: ID!
         Description: String
@@ -164,7 +166,7 @@ const typeDefs = gql`
             Rol: String
             Address: String
             Birthdate: String
-            Image: String
+            Image: Upload
             active: Boolean = true
         ): Response
 
@@ -176,7 +178,7 @@ const typeDefs = gql`
             Phone: String
             Address: String
             Birthdate: String
-            Image: String
+            Image: Upload
         ): Response
 
         login(
