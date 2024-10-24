@@ -108,7 +108,12 @@ const userResolvers = {
                     imageUrl = await uploadImage();
                 } catch (error) {
                     console.error("Error handling the image upload: ", error);
-                    throw new Error('Error en la subida de imagen');
+                    return {
+                        success: false,
+                        code: 500,
+                        message: 'Error en la subida de imagen',
+                        details: error.message
+                    };
                 }
             }
 
