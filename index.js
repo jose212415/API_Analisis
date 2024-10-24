@@ -8,7 +8,7 @@ const { getUserFromToken } = require('./utils/auth');
 const startServer = async () => {
     const app = express();
 
-    app.use(graphqlUploadExpress());
+    app.use(graphqlUploadExpress({ maxFileSize: 50000000, maxFiles: 10 }));
 
     const server = new ApolloServer({
         typeDefs,
