@@ -15,6 +15,7 @@ const startServer = async () => {
         resolvers,
         introspection: true,
         playground: true,
+        uploads: true,
         context: ({ req }) => {
             const token = req.headers.authorization || '';
             const user = getUserFromToken(token.replace('Bearer ', ''));
