@@ -131,6 +131,8 @@ const typeDefs = gql`
         Time: String
         ActivityId: Int
         active: Boolean
+        
+        activity: Activity
     }
 
     type Query {
