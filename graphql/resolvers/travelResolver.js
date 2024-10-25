@@ -97,22 +97,45 @@ const travelResolvers = {
 
             // Consultar las actividades de ActivityTravelPlace relacionadas
             const activityTravelPlacesRes = await pool.query(`
-                SELECT * FROM "ActivityTravelPlace" WHERE "TravelPlaceId" IN (
+                SELECT 
+                    atp."Id" AS "ActivityTravelPlaceId",
+                    atp."TravelPlaceId",
+                    atp."Date",
+                    atp."Time",
+                    atp."ActivityId",
+                    atp."active" AS "ActivityTravelPlaceActive",
+                    a."Id" AS "ActivityId",
+                    a."Description" AS "ActivityDescription",
+                    a."IconId" AS "ActivityIconId",
+                    a."price" AS "ActivityPrice",
+                    a."active" AS "ActivityActive"
+                FROM "ActivityTravelPlace" atp
+                JOIN "Activity" a ON atp."ActivityId" = a."Id"
+                WHERE atp."TravelPlaceId" IN (
                     SELECT "Id" FROM "TravelPlaces" WHERE "TravelId" = $1
                 )
             `, [args.Id]);
+
             // Iterar sobre las filas devueltas y formatear el campo Date
             travel.activityTravelPlaces = activityTravelPlacesRes.rows.map(row => {
                 // Convertir el timestamp a Date y luego formatearlo
-                console.log(row.Date);
-                const formattedDate = row.Date ? formateDate(row.Date, 10) : null;
-                
+                const formattedDate = formateDate(row.Date);
                 return {
-                    ...row,
-                    Date: formattedDate // Aplicar el valor formateado
+                    Id: row.ActivityTravelPlaceId,
+                    TravelPlaceId: row.TravelPlaceId,
+                    Date: formattedDate,
+                    Time: row.Time,
+                    ActivityId: row.ActivityId,
+                    active: row.ActivityTravelPlaceActive,
+                    activity: {
+                        Id: row.ActivityId,
+                        Description: row.ActivityDescription,
+                        IconId: row.ActivityIconId,
+                        price: row.ActivityPrice,
+                        active: row.ActivityActive
+                    }
                 };
             });
-            travel.activityTravelPlaces = activityTravelPlacesRes.rows;
 
             return travel;
         },
