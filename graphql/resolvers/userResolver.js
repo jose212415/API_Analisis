@@ -52,7 +52,7 @@ const userResolvers = {
                     const year = birthdate.getFullYear();
         
                     // Formatear la fecha como MM-DD-YYYY
-                    user.Birthdate = `${month}-${day}-${year}`;
+                    user.Birthdate = `${day}-${month}-${year}`;
                 } else {
                     user.Birthdate = null; // Si la fecha es inválida
                 }
@@ -176,20 +176,21 @@ const userResolvers = {
             // Cifrar la contraseña antes de guardarla
             //const hashedPassword = await bcrypt.hash(Password, 10);
 
-            // Subir la imagen solo si se proporciona
-            let imageUrl = null;
-            if (Image) {
+            let imageUrl;
+            if (!Image) {
+                const userResult = await pool.query('SELECT "Image" FROM "Users" WHERE "Id" = $1', [Id]);
+                imageUrl = userResult.rows[0].Image; // Usar la imagen actual
+            } else {
+                // Si se proporciona una nueva imagen, subirla a MinIO
                 try {
-                    // Resolver la promesa de `Image` y acceder a `file.createReadStream`
                     const imageFile = await Image;
-                    const { createReadStream, filename, mimetype } = imageFile.file; // Acceder a la propiedad 'file'
+                    const { createReadStream, filename, mimetype } = imageFile.file;
 
-                    // Validar si el createReadStream existe
                     if (typeof createReadStream !== 'function') {
                         throw new Error('createReadStream is not a function');
                     }
 
-                    // Subir la imagen a MinIO usando Upload
+                    // Subir la imagen a MinIO
                     const uploadImage = async () => {
                         const upload = new Upload({
                             client: s3,
@@ -204,7 +205,7 @@ const userResolvers = {
 
                         try {
                             const data = await upload.done();
-                            return `https://bucket-production-a192.up.railway.app/images-travel-agency-app/${data.Key}`; // URL de la imagen subida
+                            return `https://bucket-production-a192.up.railway.app/images-travel-agency-app/${data.Key}`;
                         } catch (error) {
                             throw new Error('Error subiendo la imagen a MinIO.');
                         }

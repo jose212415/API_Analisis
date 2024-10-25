@@ -35,6 +35,11 @@ const typeDefs = gql`
         Description: String
         Price: Float
         active: Boolean
+
+        # Campos relacionados
+        travelPlaces: [TravelPlace]
+        travelImages: [TravelImage]
+        activityTravelPlaces: [ActivityTravelPlace]
     }
 
     type Country {
@@ -49,6 +54,8 @@ const typeDefs = gql`
         Description: String
         CountryId: Int
         active: Boolean
+        
+        country: Country
     }
 
     type PlaceCategory {
@@ -64,6 +71,9 @@ const typeDefs = gql`
         CityId: Int
         PlaceCategoryId: Int
         active: Boolean
+
+        city: City
+        placeCategory: PlaceCategory 
     }
 
     type TravelPlace {
@@ -72,7 +82,7 @@ const typeDefs = gql`
         PlaceId: Int
         active: Boolean
         travel: Travel
-        place: Place  
+        place: Place
     }
 
     type TravelCategory {
@@ -114,9 +124,26 @@ const typeDefs = gql`
         active: Boolean
     }
 
+    type ActivityTravelPlace {
+        Id: ID!
+        TravelPlaceId: Int
+        Date: String
+        Time: String
+        ActivityId: Int
+        active: Boolean
+    }
+
     type Query {
         users(limit: Int, offset: Int): [User]
         user(Id: ID!): User
+
+        travelImages(limit: Int, offset: Int): [TravelImage]
+        travelImage(Id: ID!): TravelImage
+        travelImagesByTravelId(TravelId: Int!): [TravelImage]
+
+        activityTravelPlaces: [ActivityTravelPlace]
+        activityTravelPlace(Id: ID!): ActivityTravelPlace
+        activityTravelPlaceByTravelId(TravelPlaceId: ID!): [ActivityTravelPlace]
 
         activities: [Activity]
         travels(limit: Int, offset: Int): [Travel]
@@ -160,6 +187,7 @@ const typeDefs = gql`
         typePayment: TypePayment
         payment: Payment
         paymentTravelUser: PaymentTravelUser
+        travelImage: TravelImage
     }   
     
     # Definir el tipo Mutation
