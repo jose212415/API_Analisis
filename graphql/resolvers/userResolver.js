@@ -39,7 +39,28 @@ const userResolvers = {
         // Obtener un usuario por ID
         user: async (parent, args) => {
             const res = await pool.query('SELECT * FROM "Users" WHERE "Id" = $1', [args.Id]);
-            return res.rows[0];
+            const user = res.rows[0];
+
+            if (user && user.Birthdate) {
+                const birthdate = new Date(user.Birthdate);
+        
+                // Verificar si la fecha es válida
+                if (!isNaN(birthdate)) {
+                    // Extraer los componentes de la fecha
+                    const day = String(birthdate.getDate()).padStart(2, '0');
+                    const month = String(birthdate.getMonth() + 1).padStart(2, '0'); // Los meses son 0 indexados
+                    const year = birthdate.getFullYear();
+        
+                    // Formatear la fecha como MM-DD-YYYY
+                    user.Birthdate = `${month}-${day}-${year}`;
+                } else {
+                    user.Birthdate = null; // Si la fecha es inválida
+                }
+            }
+
+            console.log(user.Birthdate);
+
+            return user;
         },
     },
 

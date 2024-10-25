@@ -107,6 +107,13 @@ const typeDefs = gql`
         active: Boolean
     }
 
+    type TravelImage {
+        Id: ID!
+        Data: String
+        TravelId: Int
+        active: Boolean
+    }
+
     type Query {
         users(limit: Int, offset: Int): [User]
         user(Id: ID!): User
