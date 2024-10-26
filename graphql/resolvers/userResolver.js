@@ -209,9 +209,9 @@ const userResolvers = {
 
             const res = await pool.query(
             `UPDATE public."Users"
-                SET "NameUsers" = $1, "LastName" = $2, "Email" = $3, "Phone" = $4, "Address" = $5, "Birthdate" = $6, "Image" = $7
-                WHERE "Id" = $8 RETURNING *;`,
-            [NameUsers, LastName, Email, Phone, Address, Birthdate, imageUrl, Id]
+                SET "NameUsers" = $1, "LastName" = $2, "Phone" = $3, "Address" = $4, "Birthdate" = $5, "Image" = $6
+                WHERE "Id" = $7 RETURNING *;`,
+            [NameUsers, LastName, Phone, Address, Birthdate, imageUrl, Id]
             );
 
             const user = res.rows[0];
