@@ -18,6 +18,7 @@ const typeDefs = gql`
         LastName: String
         Email: String
         Phone: String
+        Password: String
         Rol: String
         Address: String
         Birthdate: String
