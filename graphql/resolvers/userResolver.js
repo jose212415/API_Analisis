@@ -173,9 +173,6 @@ const userResolvers = {
                 throw new Error('El correo electrónico ya está registrado.');
             }
 
-            // Cifrar la contraseña antes de guardarla
-            //const hashedPassword = await bcrypt.hash(Password, 10);
-
             let imageUrl;
             if (!Image) {
                 const userResult = await pool.query('SELECT "Image" FROM "Users" WHERE "Id" = $1', [Id]);

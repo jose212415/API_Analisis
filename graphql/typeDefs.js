@@ -131,7 +131,7 @@ const typeDefs = gql`
         Time: String
         ActivityId: Int
         active: Boolean
-        
+
         activity: Activity
     }
 
@@ -209,9 +209,9 @@ const typeDefs = gql`
 
         updateUser(
             Id: Int!
-            NameUsers: String!
-            LastName: String!
-            Email: String!
+            NameUsers: String
+            LastName: String
+            Email: String
             Phone: String
             Address: String
             Birthdate: String
