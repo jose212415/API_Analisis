@@ -152,7 +152,7 @@ const userResolvers = {
                 user
             };
         },
-        // Actualizar Informacion del usurio
+        // Actualizar Información del usuario
         updateUser: async (parent, args) => {
             const {
                 Id,
@@ -165,61 +165,76 @@ const userResolvers = {
                 Image,
             } = args;
 
-            let imageUrl;
-            if (!Image) {
-                const userResult = await pool.query('SELECT "Image" FROM "Users" WHERE "Id" = $1', [Id]);
-                imageUrl = userResult.rows[0].Image; // Usar la imagen actual
-            } else {
-                // Si se proporciona una nueva imagen, subirla a MinIO
-                try {
-                    const imageFile = await Image;
-                    const { createReadStream, filename, mimetype } = imageFile.file;
+            try {
+                let imageUrl;
+                if (!Image) {
+                    // Obtener la imagen actual si no se proporciona una nueva
+                    const userResult = await pool.query('SELECT "Image" FROM "Users" WHERE "Id" = $1', [Id]);
+                    imageUrl = userResult.rows[0].Image;
+                } else {
+                    // Si se proporciona una nueva imagen, subirla a MinIO
+                    try {
+                        const imageFile = await Image;
+                        const { createReadStream, filename, mimetype } = imageFile.file;
 
-                    if (typeof createReadStream !== 'function') {
-                        throw new Error('createReadStream is not a function');
-                    }
-
-                    // Subir la imagen a MinIO
-                    const uploadImage = async () => {
-                        const upload = new Upload({
-                            client: s3,
-                            params: {
-                                Bucket: 'images-travel-agency-app',
-                                Key: `${Date.now()}-${filename}`, // Nombre único para la imagen
-                                Body: createReadStream(), // El stream de la imagen
-                                ContentType: mimetype,
-                                ACL: 'public-read',
-                            },
-                        });
-
-                        try {
-                            const data = await upload.done();
-                            return `https://bucket-production-a192.up.railway.app/images-travel-agency-app/${data.Key}`;
-                        } catch (error) {
-                            throw new Error('Error subiendo la imagen a MinIO.');
+                        if (typeof createReadStream !== 'function') {
+                            console.error('createReadStream is not a function');
+                            return { message: 'Error: createReadStream no es una función válida.' };
                         }
-                    };
 
-                    imageUrl = await uploadImage();
-                } catch (error) {
-                    console.error("Error handling the image upload: ", error);
-                    throw new Error('Error en la subida de imagen');
+                        // Subir la imagen a MinIO
+                        const uploadImage = async () => {
+                            const upload = new Upload({
+                                client: s3,
+                                params: {
+                                    Bucket: 'images-travel-agency-app',
+                                    Key: `${Date.now()}-${filename}`,
+                                    Body: createReadStream(),
+                                    ContentType: mimetype,
+                                    ACL: 'public-read',
+                                },
+                            });
+
+                            try {
+                                const data = await upload.done();
+                                return `https://bucket-production-a192.up.railway.app/images-travel-agency-app/${data.Key}`;
+                            } catch (error) {
+                                console.error('Error subiendo la imagen a MinIO:', error);
+                                return { message: 'Error subiendo la imagen a MinIO.' };
+                            }
+                        };
+
+                        const uploadResult = await uploadImage();
+                        if (uploadResult.message) {
+                            return uploadResult; // Si hubo un error al subir la imagen, retornar el mensaje de error
+                        }
+
+                        imageUrl = uploadResult;
+                    } catch (error) {
+                        console.error("Error handling the image upload:", error);
+                        return { message: 'Error en la subida de imagen' };
+                    }
                 }
+
+                // Actualizar información del usuario en la base de datos
+                const res = await pool.query(
+                    `UPDATE public."Users"
+                        SET "NameUsers" = $1, "LastName" = $2, "Phone" = $3, "Address" = $4, "Birthdate" = $5, "Image" = $6
+                        WHERE "Id" = $7 RETURNING *;`,
+                    [NameUsers, LastName, Phone, Address, Birthdate, imageUrl, Id]
+                );
+
+                const user = res.rows[0];
+
+                return {
+                    message: 'Usuario actualizado exitosamente',
+                    user
+                };
+
+            } catch (error) {
+                console.error("Error updating user:", error);
+                return { message: 'Error al actualizar el usuario' };
             }
-
-            const res = await pool.query(
-            `UPDATE public."Users"
-                SET "NameUsers" = $1, "LastName" = $2, "Phone" = $3, "Address" = $4, "Birthdate" = $5, "Image" = $6
-                WHERE "Id" = $7 RETURNING *;`,
-            [NameUsers, LastName, Phone, Address, Birthdate, imageUrl, Id]
-            );
-
-            const user = res.rows[0];
-
-            return {
-                message: 'Usuario actualizado exitosamente',
-                user
-            };
         },
     },
 };
