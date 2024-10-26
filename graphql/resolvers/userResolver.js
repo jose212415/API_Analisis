@@ -79,6 +79,14 @@ const userResolvers = {
             active
             } = args;
 
+            // Verificar si el email ya existe
+            const checkEmail = await pool.query('SELECT * FROM "Users" WHERE "Email" = $1', [Email]);
+
+            if (checkEmail.rows.length > 0) {
+                // Si ya existe un usuario con ese email, lanzamos un error
+                throw new Error('El correo electrónico ya está registrado.');
+            }
+
             // Cifrar la contraseña antes de guardarla
             const hashedPassword = await bcrypt.hash(Password, 10);
 
@@ -156,14 +164,6 @@ const userResolvers = {
                 Birthdate,
                 Image,
             } = args;
-
-             // Verificar si el email ya existe
-            const checkEmail = await pool.query('SELECT * FROM "Users" WHERE "Email" = $1', [Email]);
-
-            if (checkEmail.rows.length > 0) {
-                // Si ya existe un usuario con ese email, lanzamos un error
-                throw new Error('El correo electrónico ya está registrado.');
-            }
 
             let imageUrl;
             if (!Image) {
