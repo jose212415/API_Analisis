@@ -29,8 +29,29 @@ const travelResolvers = {
     Query: {
         // Obtener todos los viajes
         travels: async (parent, { limit, offset }) => {
-            const res = await pool.query('SELECT * FROM "Travels" LIMIT $1 OFFSET $2', [limit, offset]);
-        return res.rows;
+            // Consultar todos los viajes con límite y desplazamiento
+            const travelsRes = await pool.query('SELECT * FROM "Travels" LIMIT $1 OFFSET $2', [limit, offset]);
+            const travels = travelsRes.rows;
+            // Formatear las fechas de cada viaje
+            const formattedTravels = travels.map(travel => ({
+                ...travel,
+                DateStart: formateDate(travel.DateStart),
+                DateEnd: formateDate(travel.DateEnd)
+            }));
+
+            // Obtener las imágenes asociadas para cada viaje
+            const travelsWithImages = await Promise.all(formattedTravels.map(async (travel) => {
+                const imagesRes = await pool.query('SELECT * FROM "TravelImages" WHERE "TravelId" = $1', [travel.Id]);
+                const images = imagesRes.rows;
+
+                // Agregar las imágenes al objeto de viaje
+                return {
+                    ...travel,
+                    travelImages: images // Añadir un campo 'images' con las imágenes asociadas
+                };
+            }));
+
+            return travelsWithImages;
         },
         // Obtener un viaje por ID
         travel: async (parent, args) => {
