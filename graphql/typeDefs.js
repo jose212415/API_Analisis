@@ -212,7 +212,6 @@ const typeDefs = gql`
             Id: Int!
             NameUsers: String
             LastName: String
-            Email: String
             Phone: String
             Address: String
             Birthdate: String
