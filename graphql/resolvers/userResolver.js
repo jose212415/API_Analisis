@@ -158,7 +158,6 @@ const userResolvers = {
                 Id,
                 NameUsers,
                 LastName,
-                Email,
                 Phone,
                 Address,
                 Birthdate,
