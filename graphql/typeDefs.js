@@ -136,6 +136,11 @@ const typeDefs = gql`
         activity: Activity
     }
 
+    type ImageUploadResponse {
+        message: String!
+        imageUrl: String
+    }
+
     type Query {
         users(limit: Int, offset: Int): [User]
         user(Id: ID!): User
@@ -278,6 +283,10 @@ const typeDefs = gql`
             UserId: Int
             PaymentId: Int
         ): Response
+
+        uploadImageMinio(
+            Image: Upload
+        ): ImageUploadResponse
     }
 `;
 

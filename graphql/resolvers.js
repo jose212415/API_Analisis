@@ -13,6 +13,7 @@ const travelPlaceResolvers = require('./resolvers/travelPlacesResolver');
 const typePaymentResolver = require('./resolvers/typePaymentResolver');
 const paymentResolver = require('./resolvers/paymentResolver');
 const paymentTravelUserResolvers = require('./resolvers/paymentTravelUser');
+const imageUploadResolvers = require('./resolvers/imageUploadResolver');
 
 // Resolvers 
 const resolvers = {
@@ -83,6 +84,7 @@ const resolvers = {
         ...typePaymentResolver.Mutation,
         ...paymentResolver.Mutation,
         ...paymentTravelUserResolvers.Mutation,
+        ...imageUploadResolvers.Mutation,
     },
 
 };
